@@ -29,7 +29,7 @@ val_ %+ %2 dd %3
 %endmacro
 
 %define MEMSIZE 1024*32
-%define TIBSIZE 80
+%define TIBSIZE 128
 %define STACKSIZE 4096
 %define TIBPTR endmem - TIBSIZE
 %define SP0 TIBPTR - 4
@@ -44,6 +44,7 @@ section .text
 ; ebx - TOS (top of data stack)
 
 _main:
+        cld
         push ebp
         mov eax,esp
         mov dword[savesp],eax
@@ -57,14 +58,34 @@ _halt:
 savesp: dd 0
 
 outchar:
+        push ebx
+        push esi
+        push ecx
+        push edi
+        push edx
         mov dl, al
         mov ah, 2
         int 0x21
+        pop edx
+        pop edi
+        pop ecx
+        pop esi
+        pop ebx
         ret
 getchar:
+        push ebx
+        push esi
+        push ecx
+        push edi
+        push edx
         mov ah,8
         int 0x21
-        and eax,0xff
+        and eax, 0xff
+        pop edx
+        pop edi
+        pop ecx
+        pop esi
+        pop ebx
         ret
 
     variable 'state', state, 0
@@ -136,7 +157,8 @@ _abort:
         xchg ebp, esp
         pop esi
         xchg ebp, esp
-next    lodsd
+next:
+        lodsd
         jmp dword[eax] ; eax is later used by docolon and dovar
 
     primitive '=', equals
@@ -175,11 +197,10 @@ zerob_z pop ebx
         jmp next
 
     primitive 'accept', accept
-        cld
-        pop edi        ; Pop the address of the string buffer into DI.
-        xor ecx,ecx     ; Clear the CX register.
+        pop edi       ; Pop the address of the string buffer into DI.
+        xor ecx,ecx   ; Clear the CX register.
 acceptl:
-        call getchar  ; Do the bios call to get a chr from the keyboard.
+        call getchar  ; Do the DOS call to get a chr from the keyboard.
         cmp al,3
         je _halt
         cmp al,8      ; See if it's a backspace (ASCII character 08h).
@@ -205,6 +226,7 @@ acceptb:
         call outchar  ; BEL chr to make a beep sound to let him know.
         jmp acceptl   ; Then go back and let him try again.
 accepts:
+        cld
         stosb         ; Save the input character into the buffer. Note that
                       ; this opcode automatically increments the pointer
                       ; in the DI register.
@@ -277,6 +299,12 @@ wordf   cmp ecx, ebx
         mov al, byte[ebx]
         inc ebx
         cmp al, dl
+        je wordf
+        cmp al, 9
+        je wordf
+        cmp al, 10
+        je wordf
+        cmp al, 13
         je wordf
 wordc   inc edi
         mov byte[edi], al
@@ -394,7 +422,7 @@ interpt dd xt_number_t_i_b
         dd intpar
         dd xt_t_i_b
         dd xt_fetch
-        dd xt_lit, 50
+        dd xt_lit, TIBSIZE - 2
         dd xt_accept
         dd xt_number_t_i_b
         dd xt_store

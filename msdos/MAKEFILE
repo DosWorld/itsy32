@@ -1,0 +1,6 @@
+all: itsy.com
+
+itsy.com: itsy.asm macros.asm
+        nasm itsy.asm -fbin -oitsy.com
+clean:
+        del itsy.com

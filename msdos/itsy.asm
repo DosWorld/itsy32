@@ -938,7 +938,7 @@ interpt dw xt_number_t_i_b  ; Get the number of characters in the input
         dw intpar           ; the buffer. Go process it.
         dw xt_t_i_b         ; if #tib = >in, we're out of text and need to
         dw xt_lit           ; read some more. Put a 50 on the stack to tell
-        dw 50               ; accept to read up to 50 more characters.
+        dw 80               ; accept to read up to 50 more characters.
         dw xt_accept        ; Go get more input.
         dw xt_number_t_i_b  ; Store into #tib the actual number of characters
         dw xt_store         ; that accept read.
