@@ -1,4 +1,8 @@
-; nasm itsy-linux.asm -fbin -l itsy-linux.lst -o itsy-linux && chmod +x itsy-linux
+; nasm itsy32.asm -frdf
+; rdx itsy32.rdf
+
+BITS 32
+use32
 
 %define link 0
 %define immediate 080h
@@ -24,52 +28,44 @@ head %1, %2, 0, dovar
 val_ %+ %2 dd %3
 %endmacro
 
-%define TEXTORG 0x00400000
-%define MEMSIZE 1048576
+%define MEMSIZE 1024*32
 %define TIBSIZE 80
 %define STACKSIZE 4096
-%define TIBPTR TEXTORG + MEMSIZE - TIBSIZE
+%define TIBPTR endmem - TIBSIZE
 %define SP0 TIBPTR - 4
 %define RP0 SP0 - STACKSIZE
 
-BITS 32
-        org     TEXTORG
-
-ehdr:                           ; Elf32_Ehdr
-        db   0x7F, "ELF", 1, 1, 1, 0     ; e_ident
-        times 8 db   0
-        dw   2                  ; e_type
-        dw   3                  ; e_machine
-        dd   1                  ; e_version
-        dd   xt_abort + 4       ; e_entry
-        dd   phdr - $$  ; e_phoff
-        dd   0                  ; e_shoff
-        dd   0                  ; e_flags
-        dw   ehdrsize   ; e_ehsize
-        dw   phdrsize   ; e_phentsize
-        dw   1                  ; e_phnum
-        dw   0x28               ; e_shentsize without setting this size 'file' complains that elf header is corrupted
-        dw   0                  ; e_shnum
-        dw   0                  ; e_shstrndx
-
-ehdrsize   equ   $ - ehdr
-
-phdr:                           ; Elf32_Phdr
-        dd   1                  ; p_type
-        dd   0                  ; p_offset
-        dd   $$                 ; p_vaddr
-        dd   $$                 ; p_paddr
-        dd   filesize   ; p_filesz
-        dd   MEMSIZE    ; p_memsz
-        dd   7                  ; p_flags
-        dd   0x1000             ; p_align
-
-phdrsize   equ   $ - phdr
+global _main:export proc
+section .text
 
 ; esp - data stack pointer
 ; ebp - return stack pointer
 ; esi - Forth instruction pointer
 ; ebx - TOS (top of data stack)
+
+_main:
+        push ebp
+        mov eax,esp
+        mov dword[savesp],eax
+        jmp _abort
+_halt:
+        mov eax, dword[savesp]
+        mov esp, eax
+        pop ebp
+        ret
+
+savesp: dd 0
+
+outchar:
+        mov dl, al
+        mov ah, 2
+        int 0x21
+        ret
+getchar:
+        mov ah,8
+        int 0x21
+        and eax,0xff
+        ret
 
     variable 'state', state, 0
     variable '>in', to_in, 0
@@ -86,6 +82,7 @@ phdrsize   equ   $ - phdr
         jmp dword[eax] ; now we jump to the address that is stored in the eax
 
     primitive 'abort', abort
+_abort:
         mov eax, dword[val_number_t_i_b]
         mov dword[val_to_in], eax
         xor ebp, ebp
@@ -178,27 +175,56 @@ zerob_z pop ebx
         jmp next
 
     primitive 'accept', accept
-        xor edx, edx
-        xchg edx, ebx ; now edx contains read byte count and ebx 0 (reading from stdin)
-        xor eax, eax
-        mov al, 3     ; sys_read
-        pop ecx       ; buffer
-        int 80h
-        xchg ebx, eax ; eax after sys_read contains number of bytes read (negative number means error), let's move it to TOS
-        dec ebx       ; last char is CR
+        cld
+        pop edi        ; Pop the address of the string buffer into DI.
+        xor ecx,ecx     ; Clear the CX register.
+acceptl:
+        call getchar  ; Do the bios call to get a chr from the keyboard.
+        cmp al,3
+        je _halt
+        cmp al,8      ; See if it's a backspace (ASCII character 08h).
+        jne acceptn   ; If not, jump for more testing.
+        jecxz acceptb ; "Jump if CX=0". If the user typed a backspace but
+                      ; there isn't anything in the buffer to erase, jump
+                      ; to the code that'll beep at him to let him know.
+        call outchar  ; User typed a backspace. Go ahead and output it.
+        mov al,' '    ; Then output a space to wipe out the character that
+        call outchar  ; the user had just typed.
+        mov al,8      ; Then output another backspace to put the cursor
+        call outchar  ; back into position to read another character.
+        dec ecx       ; We just deleted a character. Now we need to decrement
+        dec edi       ; both the counter and the buffer pointer.
+        jmp acceptl   ; Then go back for another character.
+acceptn:
+        cmp al,13     ; See if the input chr is a carriage return.
+        je acceptz    ; If so, we're done. jump to the end of the routine.
+        cmp ecx,ebx   ; Compare current string length to the maximum allowed.
+        jne accepts   ; If the string's not too long, jump.
+acceptb:
+        mov al,7      ; User's input is unusable in some way. Send the
+        call outchar  ; BEL chr to make a beep sound to let him know.
+        jmp acceptl   ; Then go back and let him try again.
+accepts:
+        stosb         ; Save the input character into the buffer. Note that
+                      ; this opcode automatically increments the pointer
+                      ; in the DI register.
+        inc ecx       ; But we have to increment the length counter manually.
+        call outchar  ; Echo the input character back to the display.
+        jmp acceptl   ; Go back for another character.
+acceptz:
+        jecxz acceptb ; If the buffer is empty, beep at the user and go
+                      ; back for more input.
+        mov al,10     ; Send a carriage return to the display...
+        call outchar  ; 
+        mov al,13     ; ...followed by a linefeed.
+        call outchar  ; 
+        mov ebx,ecx     ; Move the count to the top of the stack.
         jmp next
 
     primitive 'emit', emit
-        push ebx
-        xor eax, eax
-        mov al, 4    ; sys_write
-        xor ebx, ebx
-        inc ebx      ; ebx now contains 1 (stdout)
-        mov ecx, esp ; buffer
-        mov edx, ebx ; write byte count
-        int 80h
-        pop ebx
-        pop ebx
+        xchg eax,ebx    ; Move our output character to the AX register.
+        call outchar  ; Send it to the display.
+        pop ebx        ; Pop the argument off the stack.
         jmp next
 
     primitive '>number', to_number
@@ -425,5 +451,10 @@ intdone dd xt_branch
         dd interpt
 
 freemem:
+        resb MEMSIZE
+endmem:
+section .data
+        resb 1
+section .bss
+        resb 1
 
-filesize   equ   $ - $$

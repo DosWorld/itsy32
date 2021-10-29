@@ -1,7 +1,6 @@
-all: itsy-linux
+all: itsy32.rdf
 
-itsy-linux: itsy-linux.asm
-	nasm itsy-linux.asm -fbin -l itsy-linux.lst -o itsy-linux
-	chmod +x itsy-linux
+itsy32.rdf: itsy32.asm
+        nasm itsy32.asm -frdf
 clean:
-	rm itsy-linux.lst itsy-linux
+        del itsy32.rdf
