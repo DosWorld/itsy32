@@ -1,7 +1,7 @@
-all: itsy-linux
+all: itsy-lin
 
-itsy-linux: itsy-linux.asm
-	nasm itsy-linux.asm -fbin -l itsy-linux.lst -o itsy-linux
-	chmod +x itsy-linux
+itsy-lin: itsy-lin.asm
+	nasm itsy-lin.asm -fbin -l itsy-lin.lst -o itsy-lin
+	chmod +x itsy-lin
 clean:
-	rm itsy-linux.lst itsy-linux
+	rm itsy-lin.lst itsy-lin

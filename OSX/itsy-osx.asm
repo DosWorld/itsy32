@@ -4,7 +4,7 @@
 ;    Translated to DOS-DPMI by github user DosWorld
 ;    Translated to Linux by github user kt97679
 ;    Translated to MacOS X by Dylan McNamee
-
+;
 ; nasm -g -f macho itsy-osx.asm && ld -macosx_version_min 10.5.0 -o itsy itsy-osx.o
 ;
 ; simple session:

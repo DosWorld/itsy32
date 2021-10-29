@@ -17,11 +17,11 @@ Original itsy code is producing .com files and can be found in "msdos" directory
 
 kt97679 ported it to 32-bit linux code - "LINIX" directory.
 
-DylanMc ported it to MacOS (also 32 bit) - "OSX" directory.
+DylanMc ported it to MacOS (also 32 bit) - "OSX" directory. Should move to any BSD pretty easily.
 
-Should move to any BSD pretty easily.
+I make port it to 32-bit DOS code - "DPMI" directory.
 
-I ported it to 32-bit DOS code. Sample session:
+Sample session:
 <pre>
 nasm itsy32.asm -frdf
 rdx itsy32.rdf
