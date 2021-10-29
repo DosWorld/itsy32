@@ -1,6 +1,9 @@
 ; Itsy Forth
 ;    Written by John Metcalf
 ;    Commentary by John Metcalf and Mike Adams
+;    Translated to DOS-DPMI by github user DosWorld
+;    Translated to Linux by github user kt97679
+;    Translated to MacOS X by Dylan McNamee
 ;
 ; Itsy Forth was written for use with NASM, the "Netwide Assembler"
 ; that's available for free download (http://www.nasm.us/).

@@ -1,7 +1,7 @@
 itsy32
 ==========
 
-Dos32 backport of itsy forth by John Metcalf
+Dos32 (DPMI) port of itsy forth by John Metcalf
 
 John Metcalf (http://www.retroprogramming.com/) implemented minimal forth system:
 <ul>
@@ -15,8 +15,13 @@ Resulting binary has very impressive size (978 bytes) and can be used to bootstr
 
 Original itsy code is producing .com files and can be found in "msdos" directory of this repository.
 
-I ported it to 32-bit DOS code. Sample session:
+kt97679 ported it to 32-bit linux code - "LINIX" directory.
 
+DylanMc ported it to MacOS (also 32 bit) - "OSX" directory.
+
+Should move to any BSD pretty easily.
+
+I ported it to 32-bit DOS code. Sample session:
 <pre>
 nasm itsy32.asm -frdf
 rdx itsy32.rdf

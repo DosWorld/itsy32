@@ -1,3 +1,10 @@
+; Itsy Forth
+;    Written by John Metcalf
+;    Commentary by John Metcalf and Mike Adams
+;    Translated to DOS-DPMI by github user DosWorld
+;    Translated to Linux by github user kt97679
+;    Translated to MacOS X by Dylan McNamee
+;
 ; nasm itsy-linux.asm -fbin -l itsy-linux.lst -o itsy-linux && chmod +x itsy-linux
 
 %define link 0
