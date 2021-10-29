@@ -1,4 +1,4 @@
-itsy-linux
+itsy32
 ==========
 
 Linux port of itsy forth by John Metcalf
@@ -18,13 +18,11 @@ Original itsy code is producing .com files and can be found in "msdos" directory
 I ported it to 32-bit linux code. Sample session:
 
 <pre>
-$ make
-nasm itsy-linux.asm -fbin -l itsy-linux.lst -o itsy-linux
-chmod +x itsy-linux
-$ ./itsy-linux 
+nasm itsy32.asm -frdf2 -o itsy32.rdf
+rdx itsy32.rdf
+
 : say_hi 72 emit 105 emit 33 emit 10 emit ;
 say_hi
 Hi!
 ^C
-$ 
 </pre>
