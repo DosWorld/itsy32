@@ -19,7 +19,7 @@ kt97679 ported it to 32-bit linux code - "LINIX" directory.
 
 DylanMc ported it to MacOS (also 32 bit) - "OSX" directory. Should move to any BSD pretty easily.
 
-I am parted it to 32-bit DOS code ("DPMI" directory) and Win32 ("WIN32" directory).
+I am ported it to 32-bit DOS code ("DPMI" directory) and Win32 ("WIN32" directory).
 
 Sample session:
 <pre>
