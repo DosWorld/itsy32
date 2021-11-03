@@ -31,3 +31,8 @@ say_hi
 Hi!
 ^C
 </pre>
+
+License
+==========
+
+The license is a simplified CC BY ("use as you wish with attribution").
