@@ -1,7 +1,7 @@
 itsy32
 ==========
 
-ITSY Forth by John Metcalf
+ITSY Forth (win32, linux, osx, dos, dpmi) by John Metcalf
 
 John Metcalf (http://www.retroprogramming.com/) implemented minimal forth system:
 <ul>
