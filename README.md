@@ -1,7 +1,7 @@
 itsy32
 ==========
 
-Dos32 (DPMI) port of itsy forth by John Metcalf
+ITSY Forth by John Metcalf
 
 John Metcalf (http://www.retroprogramming.com/) implemented minimal forth system:
 <ul>
@@ -19,7 +19,7 @@ kt97679 ported it to 32-bit linux code - "LINIX" directory.
 
 DylanMc ported it to MacOS (also 32 bit) - "OSX" directory. Should move to any BSD pretty easily.
 
-I make port it to 32-bit DOS code - "DPMI" directory.
+I am parted it to 32-bit DOS code ("DPMI" directory) and Win32 ("WIN32" directory).
 
 Sample session:
 <pre>
