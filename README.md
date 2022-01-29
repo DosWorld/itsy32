@@ -32,6 +32,11 @@ Hi!
 ^C
 </pre>
 
+Dependency:
+==========
+
+Required linker RLINK from https://github.com/DosWorld/rtools/
+
 License
 ==========
 
