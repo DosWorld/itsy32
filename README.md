@@ -23,8 +23,9 @@ I am ported it to 32-bit DOS code ("DPMI" directory) and Win32 ("WIN32" director
 
 Sample session:
 <pre>
-nasm itsy32.asm -frdf
-rdx itsy32.rdf
+nasm itsy32.asm -f rdf
+rlink dospe /s=256 /o=itsy32.exe itsy32.rdf
+itsy32.exe
 
 : say_hi 72 emit 105 emit 33 emit 10 emit ;
 say_hi
